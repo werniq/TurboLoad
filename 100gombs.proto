@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package protofiles;
+option go_package = "./";
+
+// Definition of the FileService gRPC service
+service FileService {
+  // Download a file from the server
+  rpc DownloadFile(DownloadRequest) returns (stream FileChunk);
+}
+
+// Request message for downloading a file
+message DownloadRequest {
+  // path to the file on the server
+  string path = 1;
+}
+
+// Response message containing a chunk of file data
+message FileChunk {
+  // Data contains a chunk of file data
+  bytes data = 1;
+  // IsLast indicates whether this is the last chunk of the file
+  bool is_last = 2;
+}
