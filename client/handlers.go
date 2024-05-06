@@ -2,9 +2,6 @@ package client
 
 import (
 	"100gombs/logger"
-	pb "100gombs/protos"
-	"100gombs/utils"
-	"context"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"io"
@@ -23,6 +20,8 @@ var (
 	counter        = 1
 	result         = []float64{}
 )
+
+const chunkSize = 1024 * 1024
 
 func run() error {
 	r := gin.Default()
@@ -43,7 +42,8 @@ func loggingThroughput() {
 			return
 		case <-ticker.C:
 			totalBytesLock.Lock()
-			result = append(result, float64(totalBytes-prevTotalBytes)/(1024*1024))
+			throughput := float64(totalBytes-prevTotalBytes) / (1024 * 1024)
+			log.Printf("\rThroughput: %.2f MB/s", throughput)
 			prevTotalBytes = totalBytes
 			totalBytesLock.Unlock()
 		}
@@ -51,51 +51,57 @@ func loggingThroughput() {
 }
 
 func download10Gb(c *gin.Context) {
-	downloadRequest := &pb.DownloadRequest{Path: "./1GB.bin"}
-
-	stream, err := client.DownloadFile(context.Background(), downloadRequest)
+	file, err := os.Open("./10GB.bin")
 	if err != nil {
-		logger.ErrorLogger.Fatalf("Failed to download file: %v\n", err)
+		logger.ErrorLogger.Fatalf("error while opening file: %v", err)
 	}
+	var wg sync.WaitGroup
+	defer file.Close()
 
-	// setting response headers
-	c.Header("Content-Disposition", "attachment; filename=10GB.bin")
-	c.Header("Content-Type", "application/octet-stream")
+	// Create a channel to communicate between goroutines
+	chunkChan := make(chan []byte)
 
-	var chunk = &pb.FileChunk{}
-
-	// Write file data directly to the response writer
 	go loggingThroughput()
 
-	// Set response headers
+	// Concurrently read from file
+	wg.Add(1)
+	go func() {
+		defer close(chunkChan)
+		buffer := make([]byte, chunkSize)
+		for {
+			bytesRead, err := file.Read(buffer)
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				logger.ErrorLogger.Fatalf("error while reading chunk: %v", err)
+			}
+			chunkChan <- buffer[:bytesRead]
+		}
+		wg.Done()
+	}()
+
+	// concurrently write to response writer
 	c.Header("Content-Disposition", "attachment; filename=10GB.bin")
 	c.Header("Content-Type", "application/octet-stream")
 
-	// Write file data directly to the response writer
-	for {
-		chunk, err = stream.Recv()
-		if err == io.EOF {
-			break
+	wg.Add(1)
+	go func() {
+		// write file data directly to the response writer
+		defer wg.Done()
+		for chunk := range chunkChan {
+			_, err = c.Writer.Write(chunk)
+			if err != nil {
+				logger.ErrorLogger.Fatalf("error while writing chunk to response: %v", err)
+			}
+			// Update total bytes
+			totalBytesLock.Lock()
+			totalBytes += int64(len(chunk))
+			totalBytesLock.Unlock()
 		}
-
-		if err != nil {
-			logger.ErrorLogger.Fatalf("error while receiving chunk: %v", err)
-		}
-
-		// Write chunk data to response
-		_, err = c.Writer.Write(chunk.Data)
-		if err != nil {
-			logger.ErrorLogger.Fatalf("error while writing chunk to response: %v", err)
-		}
-
-		// Update total bytes
-		totalBytesLock.Lock()
-		totalBytes += int64(len(chunk.Data))
-		totalBytesLock.Unlock()
-	}
-
-	logger.InfoLogger.Println("File sent successfully")
+	}()
+	wg.Wait()
 	stopLogging <- struct{}{}
 
-	logger.InfoLogger.Println("Average Throughput: ", utils.Avg(result), "MB/s")
+	logger.InfoLogger.Println("File sent successfully")
 }

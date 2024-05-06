@@ -10,9 +10,8 @@ type FileServer struct {
 	pb.UnimplementedFileServiceServer
 }
 
-const chunkSize = 1024 * 1024
+const chunkSize = 4096
 
-//const chunkSize = 4096
 // const chunkSize = 2048
 // const chunkSize = 1024
 //const chunkSize = 512

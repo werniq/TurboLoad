@@ -19,7 +19,7 @@ func RunClient() {
 	// Connect to the gRPC server
 	conn, err := grpc.Dial("localhost:50051", grpc.WithTransportCredentials(
 		insecure.NewCredentials(),
-	))
+	), grpc.WithBlock())
 	if err != nil {
 		logger.ErrorLogger.Fatalf("failed to connect: %v", err)
 	}
