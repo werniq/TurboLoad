@@ -43,7 +43,7 @@ func loggingThroughput() {
 		case <-ticker.C:
 			totalBytesLock.Lock()
 			throughput := float64(totalBytes-prevTotalBytes) / (1024 * 1024)
-			log.Printf("\rThroughput: %.2f MB/s", throughput)
+			logger.InfoLogger.Printf("Throughput: %.2f MB/s\n", throughput)
 			prevTotalBytes = totalBytes
 			totalBytesLock.Unlock()
 		}
@@ -102,6 +102,4 @@ func download10Gb(c *gin.Context) {
 	}()
 	wg.Wait()
 	stopLogging <- struct{}{}
-
-	logger.InfoLogger.Println("File sent successfully")
 }
