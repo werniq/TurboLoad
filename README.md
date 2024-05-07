@@ -14,6 +14,9 @@ Output:
 
 ![img.png](imgs/img.png)
 
+### Outcomes:
+- By one user reported that using this service he reduced download time of 1 GB file to under 5 seconds.
+
 Launch this service using: <br />
 `git clone https://github.com/werniq/TurboLoad`
 <br />
