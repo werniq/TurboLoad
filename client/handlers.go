@@ -68,11 +68,13 @@ func download10Gb(c *gin.Context) {
 	go func() {
 		defer close(chunkChan)
 		buffer := make([]byte, chunkSize)
+
 		for {
 			bytesRead, err := file.Read(buffer)
 			if err == io.EOF {
 				break
 			}
+
 			if err != nil {
 				logger.ErrorLogger.Fatalf("error while reading chunk: %v", err)
 			}
@@ -100,6 +102,7 @@ func download10Gb(c *gin.Context) {
 			totalBytesLock.Unlock()
 		}
 	}()
+
 	wg.Wait()
 	stopLogging <- struct{}{}
 }
