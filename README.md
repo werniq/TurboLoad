@@ -12,9 +12,14 @@ for different files, interaction with database, or any other updates.
 <hr style="height: 4px"/>
 Output: 
 
-![img.png](img.png)
+![img.png](imgs/img.png)
 
-Launch this service using:
->    go build -o server.exe .
->
->   ./server.exe
+Launch this service using: <br />
+`git clone https://github.com/werniq/TurboLoad`
+<br />
+`cd mainserver`
+<br />
+`go build -o server.exe .`
+<br />
+`./server.exe`
+<br />

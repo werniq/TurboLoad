@@ -15,3 +15,27 @@ func Avg(arr []float64) string {
 	average := sum / float64(len(arr))
 	return fmt.Sprintf("%.2f", average)
 }
+
+func Max(arr []float64) string {
+	m := arr[0]
+
+	for _, v := range arr {
+		if m < v {
+			m = v
+		}
+	}
+
+	return fmt.Sprintf("%d", m)
+}
+
+func Min(arr []float64) string {
+	m := arr[0]
+
+	for _, v := range arr {
+		if m < v {
+			m = v
+		}
+	}
+
+	return fmt.Sprintf("%d", m)
+}

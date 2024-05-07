@@ -1,4 +1,4 @@
-module 100gombs
+module github.com/werniq/turboload
 
 go 1.21
 

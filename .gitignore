@@ -1,7 +1,8 @@
 
-/1GB.bin
-/10GB.bin
+/files/1GB.bin
+/files/10GB.bin
 /build
 /protos
 /100gombs.proto
 /server.exe
+/files

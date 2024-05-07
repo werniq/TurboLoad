@@ -1,9 +1,9 @@
-package client
+package server
 
 import (
-	"100gombs/logger"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/werniq/turboload/logger"
 	"io"
 	"log"
 	"os"
@@ -51,7 +51,7 @@ func loggingThroughput() {
 }
 
 func download10Gb(c *gin.Context) {
-	file, err := os.Open("./10GB.bin")
+	file, err := os.Open("./files/10GB.bin")
 	if err != nil {
 		logger.ErrorLogger.Fatalf("error while opening file: %v", err)
 	}
