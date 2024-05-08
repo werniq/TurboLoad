@@ -1,11 +1,19 @@
 package p2p
 
 import (
-	"100gombs/logger"
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/multiformats/go-multiaddr"
+	"github.com/werniq/peer2peer_turboload/logger"
+	"net"
 )
+
+type Listener struct {
+	listenerAddress string
+	listener        net.Listener
+	//     peers map[string]Peer
+	peers map[net.Addr]Peer
+}
 
 var (
 	MainNodeAddr = []multiaddr.Multiaddr{}

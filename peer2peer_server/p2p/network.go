@@ -1,13 +1,13 @@
 package p2p
 
 import (
-	"100gombs/logger"
 	"context"
 	"fmt"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/multiformats/go-multiaddr"
+	"github.com/werniq/peer2peer_turboload/logger"
 	"os"
 	"os/signal"
 	"sync"

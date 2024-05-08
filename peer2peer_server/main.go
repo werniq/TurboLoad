@@ -2,6 +2,8 @@ package main
 
 import (
 	"github.com/werniq/peer2peer_turboload/logger"
+	"github.com/werniq/peer2peer_turboload/p2p"
+	"log"
 	"net"
 	"time"
 )
@@ -17,17 +19,23 @@ var nodes chan *Node
 func main() {
 	// Steps to implement:
 	// 1. Create peer-to-peer network
-	network := createNetwork()
+	//network := createNetwork()
+	//
+	//// 2. Launch main node
+	//mainNode = &Node{
+	//	ID:   "main",
+	//	Addr: "localhost:8081",
+	//}
+	//go launchMainNode(network)
+	//
+	//// 4. Listen for new nodes
+	//go listenForNewNodes(network)
 
-	// 2. Launch main node
-	mainNode = &Node{
-		ID:   "main",
-		Addr: "localhost:8081",
+	tt := p2p.NewTCPTransport(":4000")
+
+	if err := tt.ListenAndAccept(); err != nil {
+		log.Fatalln(err)
 	}
-	go launchMainNode(network)
-
-	// 4. Listen for new nodes
-	go listenForNewNodes(network)
 
 	// Keep the main goroutine alive
 	select {}

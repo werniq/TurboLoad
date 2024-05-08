@@ -1,8 +1,11 @@
 build:
-	@go build -o bin/go100mbps .
+	@echo "[*] BUILDING DIRECTORY"
+	go build -o bin/go100mbps .
 
-run: ../build
-	@./bin/go100mbps
+run: build
+	@echo "[*] RUNNING SERVER"
+	./bin/go100mbps
 
 test:
-	@go test ./... -v
+	@echo "[*] TESTING GO FILES"
+	go test ./... -v
