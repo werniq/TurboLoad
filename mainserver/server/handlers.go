@@ -51,6 +51,7 @@ func loggingThroughput() {
 }
 
 func download10Gb(c *gin.Context) {
+    currentConcurrentRequest++
 	file, err := os.Open("./files/10GB.bin")
 	if err != nil {
 		logger.ErrorLogger.Fatalf("error while opening file: %v", err)
@@ -104,5 +105,6 @@ func download10Gb(c *gin.Context) {
 	}()
 
 	wg.Wait()
+    currentConcurrentRequest--
 	stopLogging <- struct{}{}
 }

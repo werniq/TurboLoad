@@ -6,3 +6,5 @@
 /100gombs.proto
 /server.exe
 /files
+/.env
+/venv
