@@ -1,9 +1,13 @@
 package server
 
-import "github.com/werniq/turboload/logger"
+import (
+	"github.com/werniq/turboload/internal/models"
+	"github.com/werniq/turboload/logger"
+)
 
 var (
-    currentConcurrentRequest = 0
+	currentConcurrentRequest = 0
+	database                 *models.Database
 )
 
 func Run() {

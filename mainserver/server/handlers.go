@@ -18,7 +18,6 @@ var (
 	totalBytesLock sync.Mutex
 	stopLogging    = make(chan struct{})
 	counter        = 1
-	result         = []float64{}
 )
 
 const chunkSize = 1024 * 1024
@@ -51,7 +50,8 @@ func loggingThroughput() {
 }
 
 func download10Gb(c *gin.Context) {
-    currentConcurrentRequest++
+	start := time.Now().Unix()
+
 	file, err := os.Open("./files/10GB.bin")
 	if err != nil {
 		logger.ErrorLogger.Fatalf("error while opening file: %v", err)
@@ -97,6 +97,7 @@ func download10Gb(c *gin.Context) {
 			if err != nil {
 				logger.ErrorLogger.Fatalf("error while writing chunk to response: %v", err)
 			}
+
 			// Update total bytes
 			totalBytesLock.Lock()
 			totalBytes += int64(len(chunk))
@@ -105,6 +106,31 @@ func download10Gb(c *gin.Context) {
 	}()
 
 	wg.Wait()
-    currentConcurrentRequest--
+
+	duration := time.Now().Unix() - start
+
+	err = updateFileInfoAfterDownload("1GB.bin", duration)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
 	stopLogging <- struct{}{}
+}
+
+// getTotalDownloads returns total amount of all downloads
+func getTotalDownloads(c *gin.Context) {
+	v, err := database.GetTotalDownloads()
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"amount": v,
+	})
 }
