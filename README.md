@@ -7,7 +7,7 @@ customers, which in turn is better User Experience. <br />
 Currently, it serves only 1 file with size 10 GB, but you can ask me to implement more handlers
 for different files, interaction with database, or any other updates.
 
-> Downloading speed in is average: 60-70 mbps; Maximal speed was 120 mbps;
+> Downloading speed in is average: 70-80 mbps; Maximal speed was 120 mbps;
 
 <hr style="height: 4px"/>
 Output: 
