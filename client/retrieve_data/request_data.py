@@ -1,3 +1,5 @@
+import json
+
 import requests
 import os
 
@@ -40,7 +42,7 @@ def get_file_statistics(filename: str) -> dict:
     :return:
     """
     server_uri = os.environ['SERVER_URI']
-    endpoint = 'get-file-data'
+    endpoint = 'get-all-file-data'
     body = {
         'filename': filename
     }
@@ -49,18 +51,18 @@ def get_file_statistics(filename: str) -> dict:
 
     if response.status_code == 200:
         data = response.json()
-        return data
+        return json.loads(data)
     else:
         return None
 
 def get_all_files_statistics() -> []:
     server_uri = os.environ['SERVER_URI']
-    endpoint = 'get-file-data'
+    endpoint = 'get-all-file-data'
 
     response = requests.get(server_uri + "/" + endpoint)
 
     if response.status_code == 200:
         data = response.json()
-        return data
+        return data['data']
     else:
         return None

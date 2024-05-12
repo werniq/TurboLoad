@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 // Statistics
 type Statistics struct {
 	// sort files by downloads_count
@@ -10,15 +12,16 @@ type Statistics struct {
 }
 
 type FilesData struct {
-	AvgDownloadTime int `json:"download_time"`
-	DownloadsCount  int `json:"downloads_count"`
-	Size            int `json:"size"`
-	CreatedAt       int `json:"created_at"`
+	Id             int       `json:"id"`
+	Filename       string    `json:"filename"`
+	DownloadsCount int       `json:"downloads_count"`
+	Size           int       `json:"size"`
+	CreatedAt      time.Time `json:"created_at"`
 }
 
 // GetAllFilesInfo returns file's statistics (*FilesData)
 func (m *Database) GetAllFilesInfo() ([]*FilesData, error) {
-	stmt := `SELECT * FROM file_info ORDER BY total_downloads DESC;`
+	stmt := `SELECT id, filename, downloads_count, size, created_at FROM file_info ORDER BY downloads_count DESC;`
 
 	rows, err := m.DB.Query(stmt)
 	if err != nil {
@@ -30,10 +33,12 @@ func (m *Database) GetAllFilesInfo() ([]*FilesData, error) {
 	for rows.Next() {
 		f := &FilesData{}
 
-		if err = rows.Scan(&f.AvgDownloadTime,
-			f.DownloadsCount,
-			f.Size,
-			f.CreatedAt,
+		if err = rows.Scan(
+			&f.Id,
+			&f.Filename,
+			&f.DownloadsCount,
+			&f.Size,
+			&f.CreatedAt,
 		); err != nil {
 			return nil, err
 		}

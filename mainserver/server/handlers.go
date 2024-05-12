@@ -61,7 +61,6 @@ func download10Gb(c *gin.Context) {
 	var wg sync.WaitGroup
 	defer file.Close()
 
-	// Create a channel to communicate between goroutines
 	chunkChan := make(chan []byte)
 
 	go loggingThroughput()
@@ -112,14 +111,82 @@ func download10Gb(c *gin.Context) {
 
 	duration := time.Now().Unix() - start
 	logger.InfoLogger.Println(" Download Duration: \t", duration)
-	//
-	//err = updateFileInfoAfterDownload("10GB.bin", duration)
-	//if err != nil {
-	//	c.JSON(500, gin.H{
-	//		"error": err.Error(),
-	//	})
-	//	return
-	//}
+
+	err = updateFileInfoAfterDownload("10GB.bin", duration)
+	if err != nil {
+		logger.ErrorLogger.Println(err)
+		return
+	}
+
+	stopLogging <- struct{}{}
+}
+
+func download1Gb(c *gin.Context) {
+	start := time.Now().Unix()
+
+	file, err := os.Open("../files/1GB.bin")
+	if err != nil {
+		logger.ErrorLogger.Fatalf("error while opening file: %v", err)
+	}
+	var wg sync.WaitGroup
+	defer file.Close()
+
+	chunkChan := make(chan []byte)
+
+	go loggingThroughput()
+
+	// Concurrently read from file
+	wg.Add(1)
+	go func() {
+		defer close(chunkChan)
+		buffer := make([]byte, chunkSize)
+
+		for {
+			bytesRead, err := file.Read(buffer)
+			if err == io.EOF {
+				break
+			}
+
+			if err != nil {
+				logger.ErrorLogger.Fatalf("error while reading chunk: %v", err)
+			}
+
+			chunkChan <- buffer[:bytesRead]
+		}
+		wg.Done()
+	}()
+
+	// concurrently write to response writer
+	c.Header("Content-Disposition", "attachment; filename=10GB.bin")
+	c.Header("Content-Type", "application/octet-stream")
+
+	wg.Add(1)
+	go func() {
+		// write file data directly to the response writer
+		defer wg.Done()
+		for chunk := range chunkChan {
+			_, err = c.Writer.Write(chunk)
+			if err != nil {
+				logger.ErrorLogger.Fatalf("error while writing chunk to response: %v", err)
+			}
+
+			// Update total bytes
+			totalBytesLock.Lock()
+			totalBytes += int64(len(chunk))
+			totalBytesLock.Unlock()
+		}
+	}()
+
+	wg.Wait()
+
+	duration := time.Now().Unix() - start
+	logger.InfoLogger.Println(" Download Duration: \t", duration)
+
+	err = updateFileInfoAfterDownload("10GB.bin", duration)
+	if err != nil {
+		logger.ErrorLogger.Println(err)
+		return
+	}
 
 	stopLogging <- struct{}{}
 }

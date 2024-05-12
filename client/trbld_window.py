@@ -36,14 +36,13 @@ class TRBLDApp:
         self.second_frame["columns"] = ("1", "2", "3")
         self.second_frame.heading("#0", text="ID")
         self.second_frame.heading("1", text="Filename")
-        self.second_frame.heading("2", text="Sized of the file")
+        self.second_frame.heading("2", text="Size of the file")
         self.second_frame.heading("3", text="Downloads count")
         self.second_frame.pack(fill="both", expand=True, padx=0, pady=5)
 
         style = ttk.Style()
         style.theme_use("default")
-        style.configure("Custom.Treeview", background="#092C46", fieldbackground="#092C46", foreground="white")
-
+        style.configure("Custom.Treeview", background="red", fieldbackground="#092C46")
 
     def insert_data_to_first_left_frame(self, data):
         # Clear existing widgets
@@ -69,7 +68,7 @@ class TRBLDApp:
 
         # Insert new data
         for item in data:
-            self.second_frame.insert("", "end", text=item[0], values=(item[1], item[2], item[3]))
+            self.second_frame.insert("", "end", text=item['id'], values=(item['filename'], item['downloads_count'], item['size'], item['created_at']))
 
 
 if __name__ == "__main__":

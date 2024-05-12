@@ -1,6 +1,9 @@
 package server
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"log"
+)
 
 func updateFileData(c *gin.Context) {
 
@@ -13,6 +16,7 @@ func getFileData(c *gin.Context) {
 		c.JSON(500, gin.H{
 			"error": err.Error(),
 		})
+		log.Println(err)
 		return
 	}
 
