@@ -11,6 +11,8 @@ var (
 )
 
 func Run() {
+	//database = models.NewDatabase()
+
 	if err := run(); err != nil {
 		logger.ErrorLogger.Fatalln(err)
 	}

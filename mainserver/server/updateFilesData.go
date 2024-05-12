@@ -8,7 +8,7 @@ func updateFileData(c *gin.Context) {
 
 // getFileData
 func getFileData(c *gin.Context) {
-	filesData, err := database.GetFileInfo()
+	filesData, err := database.GetAllFilesInfo()
 	if err != nil {
 		c.JSON(500, gin.H{
 			"error": err.Error(),

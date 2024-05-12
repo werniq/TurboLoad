@@ -16,8 +16,8 @@ type FilesData struct {
 	CreatedAt       int `json:"created_at"`
 }
 
-// GetFileInfo returns file's statistics (*FilesData)
-func (m *Database) GetFileInfo() ([]*FilesData, error) {
+// GetAllFilesInfo returns file's statistics (*FilesData)
+func (m *Database) GetAllFilesInfo() ([]*FilesData, error) {
 	stmt := `SELECT * FROM file_info ORDER BY total_downloads DESC;`
 
 	rows, err := m.DB.Query(stmt)
@@ -71,4 +71,16 @@ func (m *Database) GetAllFilenames() ([]string, error) {
 	}
 
 	return res, nil
+}
+
+// InsertFile used to insert new file into database after it was created
+func (m *Database) InsertFile(filename string) error {
+	stmt := `INSERT INTO file_info(filename) VALUES($1)`
+
+	_, err := m.DB.Exec(stmt, filename)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

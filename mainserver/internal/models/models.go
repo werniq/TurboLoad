@@ -38,8 +38,9 @@ func NewDatabase() *Database {
 	);
 */
 
+// AfterResponseUpdate updates statistics in database after download
 func (m *Database) AfterResponseUpdate(filename string, duration int64) error {
-	stmt := `UPDATE files_statistics SET 
+	stmt := `UPDATE file_info SET 
                             downloads_count = downloads_count + 1 
                         WHERE filename = $1`
 
@@ -48,7 +49,7 @@ func (m *Database) AfterResponseUpdate(filename string, duration int64) error {
 		return err
 	}
 
-	stmt = `INSERT INTO recent_statistics(
+	stmt = `INSERT INTO statistics(
             	filename, 
                 download_duration, 
                 created_at) 

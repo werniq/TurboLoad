@@ -9,6 +9,20 @@ for different files, interaction with database, or any other updates.
 
 > Downloading speed in is average: 70-80 mbps; Maximal speed was 120 mbps;
 
+## Methodology
+> Tests were performed 10-100 times with file of size 1 GB \n
+
+### 1 GB file
+> 1 connection - file downloads in 5 seconds  <br />
+> 10 simultaneous connections - download is 10-15 seconds <br />
+> 100 concurrent requests - download time approaches 1 minute  <br />
+
+### 10 GB file
+> 1 connection - file downloads in 80 seconds  <br />
+> 10 simultaneous connections - download is around 120-180 seconds <br />
+
+[//]: # (> 100 concurrent requests - download time approaches 1 minute  <br />)
+
 <hr style="height: 4px"/>
 Output: 
 

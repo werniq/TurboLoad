@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	ErrorLogger    = log.New(os.Stdout, "[ERROR]: \t", log.Lshortfile|log.Ldate|log.Ltime)
-	InfoLogger     = log.New(os.Stdout, "[INFO]: \t", log.Lshortfile|log.Ldate|log.Ltime)
-	totalBytes     int64
+	ErrorLogger          = log.New(os.Stdout, "[ERROR]: \t", log.Lshortfile|log.Ldate|log.Ltime)
+	InfoLogger           = log.New(os.Stdout, "[INFO]: \t", log.Lshortfile|log.Ldate|log.Ltime)
+	totalBytes     int64 = 1024 * 1024 * 10
 	totalBytesLock sync.Mutex
 	stopLogging    = make(chan struct{})
 	counter        = 1
@@ -34,7 +34,6 @@ func loggingThroughput() {
 	defer ticker.Stop()
 
 	var prevTotalBytes int64
-
 	for {
 		select {
 		case <-stopLogging:
@@ -49,10 +48,13 @@ func loggingThroughput() {
 	}
 }
 
+// download10Gb handler is the main function to download file from server
+// it also updates statistics in statistics table:
+// total_downloads, megabits_transferred, concurrent_downloads, and average_download_time
 func download10Gb(c *gin.Context) {
 	start := time.Now().Unix()
 
-	file, err := os.Open("./files/10GB.bin")
+	file, err := os.Open("../files/10GB.bin")
 	if err != nil {
 		logger.ErrorLogger.Fatalf("error while opening file: %v", err)
 	}
@@ -79,6 +81,7 @@ func download10Gb(c *gin.Context) {
 			if err != nil {
 				logger.ErrorLogger.Fatalf("error while reading chunk: %v", err)
 			}
+
 			chunkChan <- buffer[:bytesRead]
 		}
 		wg.Done()
@@ -108,14 +111,15 @@ func download10Gb(c *gin.Context) {
 	wg.Wait()
 
 	duration := time.Now().Unix() - start
-
-	err = updateFileInfoAfterDownload("1GB.bin", duration)
-	if err != nil {
-		c.JSON(500, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
+	logger.InfoLogger.Println(" Download Duration: \t", duration)
+	//
+	//err = updateFileInfoAfterDownload("10GB.bin", duration)
+	//if err != nil {
+	//	c.JSON(500, gin.H{
+	//		"error": err.Error(),
+	//	})
+	//	return
+	//}
 
 	stopLogging <- struct{}{}
 }
