@@ -63,7 +63,7 @@ func download10Gb(c *gin.Context) {
 
 	chunkChan := make(chan []byte)
 
-	go loggingThroughput()
+	//go loggingThroughput()
 
 	// Concurrently read from file
 	wg.Add(1)
@@ -111,12 +111,12 @@ func download10Gb(c *gin.Context) {
 
 	duration := time.Now().Unix() - start
 	logger.InfoLogger.Println(" Download Duration: \t", duration)
-
-	err = updateFileInfoAfterDownload("10GB.bin", duration)
-	if err != nil {
-		logger.ErrorLogger.Println(err)
-		return
-	}
+	//
+	//err = updateFileInfoAfterDownload("10GB.bin", duration)
+	//if err != nil {
+	//	logger.ErrorLogger.Println(err)
+	//	return
+	//}
 
 	stopLogging <- struct{}{}
 }

@@ -1,11 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"sync"
-	"time"
 )
 
 const (
@@ -29,21 +27,16 @@ func main() {
 			defer resp.Body.Close()
 
 			// Create a buffer to reuse for reading the response body
-			buffer := make([]byte, 1024)
-			var totalBytes int
+			buffer := make([]byte, 1024*1024)
 			for {
-				n, err := resp.Body.Read(buffer)
+				_, err = resp.Body.Read(buffer)
 				if err != nil {
 					if err != io.EOF {
 						panic(err)
 					}
 					break
 				}
-				totalBytes += n
 			}
-
-			fmt.Printf("Downloaded %d bytes\n", totalBytes)
-			time.Sleep(time.Second * 5)
 		}()
 	}
 	wg.Wait()

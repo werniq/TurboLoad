@@ -30,8 +30,13 @@ func main() {
 	//
 	//// 4. Listen for new nodes
 	//go listenForNewNodes(network)
+	tcpOpts := p2p.TCPTransportOpts{
+		ListenAddr:    ":4000",
+		HandshakeFunc: p2p.NOPHandshakeFunc,
+		Decoder:       p2p.DefaultDecoder{},
+	}
 
-	tt := p2p.NewTCPTransport(":4000")
+	tt := p2p.NewTCPTransport(tcpOpts)
 
 	if err := tt.ListenAndAccept(); err != nil {
 		log.Fatalln(err)

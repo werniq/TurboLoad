@@ -9,14 +9,18 @@ import (
 type TCPTransport struct {
 	listenerAddress string
 	listener        net.Listener
-	handshakeFunc   HandshakeFunc
-	decoder         Decoder
+	//handshakeFunc   HandshakeFunc
+	TCPTransportOpts
 
 	mu    sync.RWMutex
 	peers map[net.Addr]Peer
 }
 
-type Temp struct{}
+type TCPTransportOpts struct {
+	Decoder       Decoder
+	ListenAddr    string
+	HandshakeFunc HandshakeFunc
+}
 
 // TCPPeer represents the node (remote) which listen and accepts data
 // over tcp connection
@@ -34,10 +38,11 @@ func NewTCPPeer(conn net.Conn, outbound bool) *TCPPeer {
 }
 
 // NewTCPTransport
-func NewTCPTransport(addr string) *TCPTransport {
+func NewTCPTransport(opts TCPTransportOpts) *TCPTransport {
 	return &TCPTransport{
-		handshakeFunc:   NOPHandshakeFunc,
-		listenerAddress: addr,
+		//handshakeFunc:   NOPHandshakeFunc,
+		//listenerAddress: addr,
+		TCPTransportOpts: opts,
 	}
 }
 
@@ -46,7 +51,7 @@ func NewTCPTransport(addr string) *TCPTransport {
 func (t *TCPTransport) ListenAndAccept() error {
 	var err error
 
-	t.listener, err = net.Listen("tcp", t.listenerAddress)
+	t.listener, err = net.Listen("tcp", t.ListenAddr)
 	if err != nil {
 		return err
 	}
@@ -73,17 +78,21 @@ func (t *TCPTransport) handleConn(conn net.Conn) {
 	var err error
 	peer := NewTCPPeer(conn, true)
 
-	if err = t.handshakeFunc(conn); err != nil {
+	if err = t.HandshakeFunc(peer); err != nil {
 		conn.Close()
+		logger.ErrorLogger.Println("TCP handshake error: ", err.Error())
+		return
 	}
 
-	msg := &Temp{}
+	msg := &Message{}
 	for {
-		if err = t.decoder.Decode(conn, msg); err != nil {
+		if err = t.Decoder.Decode(conn, msg); err != nil {
 			logger.ErrorLogger.Printf("TCP decoding error: %v\n", err)
 			continue
 		}
-	}
 
-	logger.InfoLogger.Printf("New incoming connection: %+v\n", peer)
+		msg.From = conn.RemoteAddr()
+
+		logger.InfoLogger.Printf("New message: %+v\n", msg)
+	}
 }

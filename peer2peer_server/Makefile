@@ -1,8 +1,15 @@
 build:
-	@go build -o bin/go100mbps.exe .
+	@echo "[*] BUILDING DIRECTORY"
+	go build -o bin/go100mbps.exe .
 
 run: build
-	@./bin/go100mbps.exe
+	@echo "[*] RUNNING SERVER"
+	./bin/go100mbps.exe
+
+no-build:
+	@echo "[*] RUNNING SERVER (WITHOUT BUILDING)"
+	./bin/go100mbps
 
 test:
-	@go test ./p2p/... -v
+	@echo "[*] TESTING GO FILES"
+	go test ./... -v

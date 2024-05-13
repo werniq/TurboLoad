@@ -8,3 +8,8 @@
 /files
 /.env
 /venv
+
+/*/bin
+/*/bin/*
+/venv
+/*/*/crt
