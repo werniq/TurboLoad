@@ -12,7 +12,7 @@ for different files, interaction with database, or any other updates.
 ## Methodology
 > Tests were performed 10-100 times with file of size 1 and 10 GB <br />
 > <hr>
-> Note: requests and actual server were performed on my machine, so it makes production version should be even faster, since you won't make the requests. <br />
+> Note: requests and actual server were performed on my machine, so it makes production version should be even faster, since your server won't make the requests. <br />
 > Note 2: Also, production version will be faster, because RunTls in golang uses HTTP/2, which also speeds up things significantly.
 
 ### 1 GB file
